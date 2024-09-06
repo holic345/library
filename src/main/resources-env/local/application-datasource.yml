@@ -1,0 +1,96 @@
+spring:
+  config:
+    activate:
+      on-profile: profile-local-datasource
+
+  datasource:
+    url:
+      # mysql SSL 사용 x (mysql 8.x 에서 사용)
+      # 서버에서 공개키 검색 허용 (mysql 8.x 에서 사용)
+      # mysql 시간대 설정
+      # DB와의 통신에 사용할 문자 인코딩
+      # jdbc bulk insert
+      # application 실행시 쿼리 로그 기록 유무 (false가 성능에 좋음)
+      # Slf4J로 로깅 설정
+      # 로깅 할 최대 쿼리 크기 설정
+      jdbc:mysql://localhost:3307/LIBRARY?
+      useSSL=false                     
+      &allowPublicKeyRetrieval=true    
+      &serverTimeZone=Asia/Seoul       
+      &characterEncoding=UTF-8         
+      &rewriteBatchedStatements=true     
+      &profileSQL=false                
+      &logger=Slf4JLogger               
+      &maxQuerySizeToLog=999999
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 120407
+    hikari:
+      # application 단에서 SQL prepared statement 캐싱 유무 (true : 성능에 좋음)
+      cachePrepStmts: true
+      # connection 마다 캐싱 할 prepared statement 수 (권장 : 250 ~ 500)
+      prepStmtCacheSize: 250
+      # 캐싱 할 SQL 쿼리 문 최대 길이 (권장 : 2048)
+      prepStmtCacheSqlLimit: 2048
+      # mysql server 단에서 클라이언트에게서 전달받은 prepared statement 캐싱 유무 (true : 성능 좋음)
+      useServerPrepStmts: true
+      # 불필요한 auto commit 을 남기지 않도록 하는 옵션
+      useLocalSessionState: true
+      # batch insert 유무 (성능 향상)
+      rewriteBatchedStatements: true
+      # ResultSet 캐싱 유무
+      cacheResultSetMetaData: true
+      # DB 설정값 캐싱 유무 (false인 경우 DB connection 할떄마다 show 명령어 실행)
+      cacheServerConfiguration: true
+      # setAutoCommit()으로 설정된 값과 MySQL 서버의 auto commit 값이 다른 경우에만 SET auto commit 명령 실행 (불필요한 작업을 줄이는 옵션)
+      elideSetAutoCommits: true
+      # getCurrentTimeMillis() 가 여러번 호출되지 않게 하는 옵션 (mysql 내부적으로 타이머 존재, 불필요한 작업을 줄이는 옵션)
+      maintainTimeStats: false
+      # 클라이언트가 connection pool의 connection을 기다리는 최대 시간 - 5000ms : 5초 (default = 30초)
+      connection-timeout: 5000
+      # connection pool의 최소 connection 수 (기본값 : maximum-pool-size 와 동일한 값)
+      minimum-idle: 5
+      # connection pool의 최대 connection 수 (default = 10)
+      maximum-pool-size: 5
+      # connnection pool이 connection의 유효성 검사를 기다리는 시간 (ms)
+      validation-timeout: 5000
+      # connection pool의 connection의 최대 유지시간 (default = 30분)
+      max-lifetime: 60000
+  # JPA configuration
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.spatial.dialect.mysql.MySQL8SpatialDialect
+    # true (default) : 웹 요청이 끝날때까지 영속성 컨텍스트 유지
+    # false (권장) : 특정 트랜잭션이 종료되면 영속성 컨텍스트 유지
+    open-in-view: false
+    hibernate:
+      # jpa ddl 테이블 생성 전략 (create, create-drop, update, validate, none)
+      ddl-auto: validate
+      # Entity 의 필드명과 DB 컬럼명의 네이밍 형식을 일치
+      naming:
+        # Camel Case -> Snake Case
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        jdbc:
+          # DB 작업을 1000개 단위로 처리 (where in 절로 처리)
+          batch_size: 1000
+          # 관계형 매핑(fetch join) 조회시 200개 단위로 처리 (where in 절로 처리)
+        default_batch_fetch_size: 200
+        dialect: org.hibernate.spatial.dialect.mysql.MySQLCustomDialect
+
+logging:
+  level:
+    org.hibernate:
+      SQL: info
+
+# p6spy 쿼리 로깅 관련 설정
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+
+
+
+

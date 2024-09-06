@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: library-local
+
+  config:
+    import:
+      # resources 폴더 아래의 설정파일을 사용해야할 경우 이곳에 작성
+      # - classpath: yml 파일
+      - classpath:application-properties.yml
+      - classpath:application-datasource.yml
+      - classpath:application-server.yml
+      - classpath:application-swagger.yml
+  profiles:
+    include:
+      - profile-local-properties
+      - profile-local-datasource
+      - profile-local-server

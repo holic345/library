@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: profile-local-server
+
+server:
+  port: 8080

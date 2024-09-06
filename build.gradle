@@ -1,0 +1,151 @@
+buildscript {
+	ext {
+		profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+		date = new Date().format('yyyy-MM-dd-HH:mm:ss:SSS')
+		queryDslVersion = "5.0.0"
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.6'
+	// querydsl 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+ext.projectVersion = version
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// springboot libraries
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// swagger dependency (springboot 3.xx 버전 이상)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+	// @Valid annotaion library
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// collection library
+	implementation 'org.apache.commons:commons-collections4:4.4'
+
+	// json libraries
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.16.1'
+
+	// P6Spy query log
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+
+	// querydsl library
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	// @ConfigurationProperties library
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	// lombok library
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+
+	// mapstruct library (mapstruct library 는 lombok 보다 아래에 위치 - 롬복 어노테이션과 충돌 방지)
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	// mysql library (mysql 8.0 이상)
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// mysql geometric 대응 라이브러리 (springboot data jpa 에서 import 되는 hibernate 버전과 밪춰야 한다.)
+	implementation 'org.hibernate:hibernate-spatial:5.6.12.Final'
+
+	// springboot test library
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// build-info.properites 파일 생성
+springBoot {
+	buildInfo()
+}
+
+/**
+ * jar : 라이브러리 jar 파일 생성
+ * bootJar : springboot 실행 가능한 jar 생성
+ */
+jar {
+	enabled = false
+}
+
+bootJar {
+	archiveFileName = "${archiveBaseName.get()}.jar"
+}
+
+// resource directory
+sourceSets {
+	main {
+		println "============================================================================="
+		println "   * Build Info [${date}]"
+		println "       -   profile : ${profile}"
+		println "       -   version : ${projectVersion}"
+		println "============================================================================="
+
+		resources {
+			srcDirs "src/main/resources-env/${profile}"
+		}
+	}
+}
+
+// querydsl 설정
+def querydslDir = 'src/main/generated'
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile).configureEach {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// querydsl QClass 위치 추가
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+	delete file(querydslDir)
+}

@@ -1,0 +1,20 @@
+springdoc:
+  api-docs:
+    version: openapi_3_0 # API 문서 버전
+    groups:
+      enabled: true # 그룹 설정 활성화 여부
+    enabled: true # swagger display enabled
+  default-consumes-media-type: application/json # 기본 consume media type
+  default-produces-media-type: application/json # 기본 produce media type
+  cache:
+    disabled: true # swagger cache 설정
+  show-actuator: true
+  swagger-ui:
+    operations-sorter: method # alpha(알파벳 오름차순), method(HTTP메소드순)
+    tags-sorter: alpha # 태그 정렬 기준
+    path: /swagger-ui.html # html 문서 접속 경로
+    disable-swagger-default-url: true # swagger-ui default url인 petstore html 문서 비활성화 여부
+    enabled: true # swagger ui 사용여부 (굳이 설정하지 않아도 default는 true)
+    display-request-duration: true  # try it out 을 했을 때 request duration 을 추가로 찍어줌
+    doc-expansion: list
+    groups-order: asc

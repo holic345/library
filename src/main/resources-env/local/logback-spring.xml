@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty name="CUR_PROFILE" source="spring.profiles.active"/>
+
+    <!-- !!!! 자신에게 맞는 프로젝트 경로로 변경하기 !!!! -->
+    <property name="LOG_MAIN_PATH"
+              value="/Users/kimbyung-gwan/workspace/library/logs"/>
+
+    <property name="CONSOLE_PATTERN"
+              value='%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n'/>
+
+    <property name="FILE_PATTERN"
+              value='%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%15.15t] %-40.40logger{39} : %m%n'/>
+
+    <appender name="LOCAL_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LIBRARY_MAIN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_MAIN_PATH}/${CUR_PROFILE}/library.log</file>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_MAIN_PATH}/library/%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+              class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="EXCEPTION_MAIN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_MAIN_PATH}/${CUR_PROFILE}/exception.log</file>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_MAIN_PATH}/exception/%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+              class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="libraryLogger" level="info">
+        <appender-ref ref="TOY_MAIN_FILE"/>
+    </logger>
+    <logger name="exceptionLogger" level="error">
+        <appender-ref ref="EXCEPTION_MAIN_FILE"/>
+    </logger>
+
+    <logger name="com.example.toyproject" level="info"/>
+    <logger level="OFF" name="org.hibernate" />
+    <logger level="OFF" name="org.apache"/>
+    <logger level="OFF" name="org.springframework"/>
+
+    <root level="info">
+        <appender-ref ref="LOCAL_CONSOLE"/>
+    </root>
+</configuration>
