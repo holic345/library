@@ -17,4 +17,7 @@ public class Book {
 
     private LocalDateTime createdDate;
 
+    public boolean isDelete() {
+        return this.status == BookStatus.DELETE;
+    }
 }

@@ -1,8 +1,9 @@
 package com.example.library.api.rent.application.usecase;
 
 import com.example.library.api.rent.application.command.CreateCommand;
+import com.example.library.api.rent.presentation.dto.CreateResponse;
 
 public interface RentUseCase {
 
-     Long createRent(CreateCommand createCommand);
+     CreateResponse createRent(CreateCommand createCommand);
 }

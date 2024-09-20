@@ -9,9 +9,12 @@ import com.example.library.api.rent.application.usecase.RentUseCase;
 import com.example.library.api.rent.domain.model.Rent;
 import com.example.library.api.rent.domain.service.RentQueryService;
 import com.example.library.api.rent.domain.service.RentService;
+import com.example.library.api.rent.presentation.dto.CreateResponse;
 import com.example.library.api.user.domain.model.User;
 import com.example.library.api.user.domain.service.UserQueryService;
 import com.example.library.api.user.domain.service.UserService;
+import com.example.library.global.exception.list.CustomBadRequestException;
+import com.example.library.global.exception.status.StatusCodeBadRequestVO;
 import jakarta.transaction.Transactional;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +35,7 @@ public class RentFacadeService implements RentUseCase {
 
     @Override
     @Transactional
-    public Long createRent(final CreateCommand createCommand) {
+    public CreateResponse createRent(final CreateCommand createCommand) {
 
         // 유저 검증
         User user = _userQueryService.findByKey(createCommand.userKey());
@@ -40,13 +43,13 @@ public class RentFacadeService implements RentUseCase {
         // 도서 검증
         Book book = _bookQueryService.findByKey(createCommand.bookKey());
 
-        if (Objects.equals(BookStatus.DELETE, book.getStatus())) {
-
+        if (book.isDelete()) {
+            throw new IllegalArgumentException("삭제된 도서 입니다.");
         }
 
         // 대여 정보 생성
         Rent rent = _rentService.create(createCommand);
 
-        return rent.getKey();
+        return new CreateResponse(rent.getKey());
     }
 }

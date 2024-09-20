@@ -23,7 +23,7 @@ spring:
       &logger=Slf4JLogger               
       &maxQuerySizeToLog=999999
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
+    username: library
     password: 120407
     hikari:
       # application 단에서 SQL prepared statement 캐싱 유무 (true : 성능에 좋음)
