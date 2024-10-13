@@ -1,18 +1,17 @@
 package com.example.library.api.rent.infrastructure.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.library.api.book.infrastructure.persistence.entity.BookEntity;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.ToOne;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,13 +28,21 @@ public class RentEntity extends AbstractAggregateRoot<RentEntity> {
     @Column(name = "KEY", columnDefinition = "bigint", nullable = false)
     private Long key;
 
-    @Column(name = "USER_KEY", columnDefinition = "bigint", nullable = false)
-    private Long userKey;
+    @OneToOne
+    @JoinColumn(name = "KEY")
+    private RentItemEntity rentItem;
 
-    @Column(name = "BOOK_KEY", columnDefinition = "bigint", nullable = false)
-    private Long bookKey;
+    @Column(name = "RETURN_DATE")
+    private LocalDateTime returnDate;
+
+    @Column(name = "EXPIRED_DATE")
+    private LocalDateTime expiredDate;
 
     @CreatedDate
     @Column(name = "CREATED_DATE", updatable = false, nullable = false)
     private LocalDateTime createdDate;
+    public void changeRentItem(RentItemEntity rentItem) {
+        this.rentItem = rentItem;
+        this.rentItem = null;
+    }
 }
